@@ -1,5 +1,10 @@
 package org.example;
 
+import com.codegym.Configuration.RedisConfig;
+import com.codegym.Configuration.SessionFactoryProvider;
+import com.codegym.Service.City.CityService;
+import com.codegym.Service.City.CityTestService;
+import com.codegym.Service.DataBase.DataBaseService;
 import com.codegym.dao.CityDAO;
 import com.codegym.dao.CountryDAO;
 import com.codegym.domain.City;
@@ -28,8 +33,11 @@ import java.util.stream.Collectors;
 import static java.util.Objects.nonNull;
 
 public class Main {
+    private DataBaseService dataBaseService;
+    private CityService cityService;
+    private CityTestService cityTestService;
     private final SessionFactory sessionFactory;
-    private final RedisClient redisClient;
+    private final RedisConfig redisClient;
 
     private final ObjectMapper mapper;
 
@@ -37,58 +45,29 @@ public class Main {
     private final CountryDAO countryDAO;
 
     public Main() {
-        sessionFactory = prepareRelationalDb();
+        dataBaseService = new DataBaseService();
+
+        sessionFactory = SessionFactoryProvider.getSessionFactory();
         cityDAO = new CityDAO(sessionFactory);
+        cityService = new CityService(cityDAO);
+        cityTestService = new CityTestService(cityDAO);
         countryDAO = new CountryDAO(sessionFactory);
 
-        redisClient = prepareRedisClient();
+        redisClient = new RedisConfig();
         mapper = new ObjectMapper();
 
     }
 
-    private SessionFactory prepareRelationalDb() {
-        final SessionFactory sessionFactory;
-        Properties properties = new Properties();
-        properties.put(Environment.DIALECT, "org.hibernate.dialect.MySQL8Dialect");
-        properties.put(Environment.DRIVER, "com.p6spy.engine.spy.P6SpyDriver");
-        properties.put(Environment.URL, "jdbc:p6spy:mysql://localhost:3307/world");
-        properties.put(Environment.USER, "root");
-        properties.put(Environment.PASS, "root");
-        properties.put(Environment.CURRENT_SESSION_CONTEXT_CLASS, "thread");
-        properties.put(Environment.HBM2DDL_AUTO, "validate");
-        properties.put(Environment.STATEMENT_BATCH_SIZE, "100");
-
-        sessionFactory = new Configuration()
-                .addAnnotatedClass(City.class)
-                .addAnnotatedClass(Country.class)
-                .addAnnotatedClass(CountryLanguage.class)
-                .addProperties(properties)
-                .buildSessionFactory();
-        return sessionFactory;
-    }
 
     private void shutdown() {
-        if (nonNull(sessionFactory)) {
-            sessionFactory.close();
-        }
+        dataBaseService.shutdown();
         if (nonNull(redisClient)) {
-            redisClient.shutdown();
+            redisClient.prepareRedisClient().shutdown();
         }
     }
 
-    private List<City> fetchData(Main main) {
-        try (Session session = main.sessionFactory.getCurrentSession()) {
-            List<City> allCities = new ArrayList<>();
-            session.beginTransaction();
-            List<Country> countries = main.countryDAO.getAll();
-            int totalCount = main.cityDAO.getTotalCount();
-            int step = 500;
-            for (int i = 0; i < totalCount; i += step) {
-                allCities.addAll(main.cityDAO.getItems(i, step));
-            }
-            session.getTransaction().commit();
-            return allCities;
-        }
+    private List<City> fetchData() {
+        return cityService.fetchData();
     }
 
     private List<CityCountry> transformData(List<City> cities) {
@@ -120,15 +99,9 @@ public class Main {
             return res;
         }).collect(Collectors.toList());
     }
-    private RedisClient prepareRedisClient() {
-        RedisClient redisClient = RedisClient.create(RedisURI.create("localhost", 6379));
-        try (StatefulRedisConnection<String, String> connection = redisClient.connect()) {
-            System.out.println("\nConnected to Redis\n");
-        }
-        return redisClient;
-    }
+
     private void pushToRedis(List<CityCountry> data) {
-        try (StatefulRedisConnection<String, String> connection = redisClient.connect()) {
+        try (StatefulRedisConnection<String, String> connection = redisClient.prepareRedisClient().connect()) {
             RedisStringCommands<String, String> sync = connection.sync();
             for (CityCountry cityCountry : data) {
                 try {
@@ -141,7 +114,7 @@ public class Main {
         }
     }
     private void testRedisData(List<Integer> ids) {
-        try (StatefulRedisConnection<String, String> connection = redisClient.connect()) {
+        try (StatefulRedisConnection<String, String> connection = redisClient.prepareRedisClient().connect()) {
             RedisStringCommands<String, String> sync = connection.sync();
             for (Integer id : ids) {
                 String value = sync.get(String.valueOf(id));
@@ -154,19 +127,12 @@ public class Main {
         }
     }
     private void testMysqlData(List<Integer> ids) {
-        try (Session session = sessionFactory.getCurrentSession()) {
-            session.beginTransaction();
-            for (Integer id : ids) {
-                City city = cityDAO.getById(id);
-                Set<CountryLanguage> languages = city.getCountry().getLanguages();
-            }
-            session.getTransaction().commit();
-        }
+        cityTestService.testMysqlData(ids);
     }
 
     public static void main(String[] args) {
         Main main = new Main();
-        List<City> allCities = main.fetchData(main);
+        List<City> allCities = main.fetchData();
         List<CityCountry> preparedData = main.transformData(allCities);
         main.pushToRedis(preparedData);
 
