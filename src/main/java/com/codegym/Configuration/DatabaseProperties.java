@@ -1,10 +1,5 @@
 package com.codegym.Configuration;
 
-import com.codegym.domain.City;
-import com.codegym.domain.Country;
-import com.codegym.domain.CountryLanguage;
-import org.hibernate.SessionFactory;
-import org.hibernate.cfg.Configuration;
 import org.hibernate.cfg.Environment;
 
 import java.util.Properties;
@@ -20,6 +15,7 @@ public class DatabaseProperties {
         properties.put(Environment.CURRENT_SESSION_CONTEXT_CLASS, "thread");
         properties.put(Environment.HBM2DDL_AUTO, "validate");
         properties.put(Environment.STATEMENT_BATCH_SIZE, "100");
+
         return properties;
     }
 }

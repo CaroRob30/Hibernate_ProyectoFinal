@@ -1,6 +1,5 @@
 package com.codegym.Service.City;
 
-import com.codegym.Service.DataBase.DataBaseService;
 import com.codegym.dao.CityDAO;
 import com.codegym.domain.City;
 

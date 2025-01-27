@@ -4,7 +4,7 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 
 public class DatabaseSessionManager {
-    private SessionFactory sessionFactory;
+    private final SessionFactory sessionFactory;
 
     public DatabaseSessionManager() {
         this.sessionFactory = SessionFactoryProvider.getSessionFactory();

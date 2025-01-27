@@ -7,7 +7,7 @@ import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 
 public class SessionFactoryProvider {
-    private static SessionFactory sessionFactory;
+    private static volatile SessionFactory sessionFactory;
 
     private SessionFactoryProvider() {
     }
