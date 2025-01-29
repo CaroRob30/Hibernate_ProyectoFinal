@@ -3,16 +3,17 @@ package com.codegym.dao;
 import com.codegym.Configuration.DatabaseSessionManager;
 import com.codegym.Configuration.SessionFactoryProvider;
 import com.codegym.domain.City;
+import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
 
 import java.util.List;
 
 public class CityDAO {
-
+    private final SessionFactory sessionFactory;
     private final DatabaseSessionManager session;
 
     public CityDAO() {
-        SessionFactoryProvider.getSessionFactory();
+        this.sessionFactory = SessionFactoryProvider.getSessionFactory();
         this.session = new DatabaseSessionManager();
     }
     public List<City> getItems(int offset, int limit) {
