@@ -1,10 +1,17 @@
-package com.codegym.domain;
+package com.codegym.Domain;
 
 
 import jakarta.persistence.*;
 
 import java.math.BigDecimal;
 import java.util.Set;
+ /*
+Esta clase también es una entidad que representa un país en la base de datos, al igual que 'City',
+está anotada con '@Entity' y es mapeada a la tabla 'country' en el esquema 'world'.
+De igual forma contiene varias propiedades y tiene relaciones con otras entidades como 'City'
+a través de '@OneToOne' y 'CountryLanguage' con '@OneToMany' que almacena los idiomas hablados en ese país.
+También se definen métodos getter y setter para acceder y modificar estos valores.
+*/
 
 @Entity
 @Table(schema = "world", name = "country")

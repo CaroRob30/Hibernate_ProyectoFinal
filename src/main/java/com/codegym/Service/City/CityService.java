@@ -1,16 +1,30 @@
 package com.codegym.Service.City;
 
-import com.codegym.dao.CityDAO;
-import com.codegym.domain.City;
+import com.codegym.DAO.CityDAO;
+import com.codegym.Domain.City;
+import com.codegym.Service.CityCountry.CityDataProcessor;
 
 import java.util.ArrayList;
 import java.util.List;
 
+/*
+Esta clase maneja la lógica relacionada con las ciudades.
+Tiene dos dependencias principales: 'CityDAO', que proporciona acceso a los datos de las ciudades,
+y 'CityDataProcessor', que se utiliza para procesar los datos.
+El método 'fetchData' recupera todos los registros de ciudades de la base de datos en bloques de 500
+ciudades a la vez, utilizando la paginación para obtener la lista completa.
+Una vez que los datos se recuperan, se agregan a una lista 'allCities' y se devuelven.
+Además, proporciona un getter para obtener el 'CityDataProcessor'.
+ */
+
 public class CityService {
     private final CityDAO cityDAO;
+    private final CityDataProcessor cityDataProcessor;
 
-    public CityService(CityDAO cityDAO) {
+    public CityService(CityDAO cityDAO, CityDataProcessor cityDataProcessor) {
         this.cityDAO = cityDAO;
+        this.cityDataProcessor = cityDataProcessor;
+
     }
 
     public List<City> fetchData() {
@@ -22,4 +36,9 @@ public class CityService {
         }
         return allCities;
     }
+
+    public CityDataProcessor getCityDataProcessor() {
+        return cityDataProcessor;
+    }
 }
+

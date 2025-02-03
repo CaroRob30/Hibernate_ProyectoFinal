@@ -3,6 +3,13 @@ package com.codegym.Configuration;
 import org.hibernate.cfg.Environment;
 
 import java.util.Properties;
+/*
+Esta clase se encarga de configurar y retornar un objeto Properties con las configuraciones necesarias
+para la conexión a una base de datos MySQL utilizando Hibernate y P6Spy.
+Incluye configuraciones como el dialecto de MySQL, el driver JDBC, la URL de conexión, las credenciales
+de acceso y las opciones relacionadas con la sesión y el batch de SQL.
+Su función es gestionar la conexión y las operaciones relacionadas con la base de datos.
+*/
 
 public class DatabaseProperties {
     public Properties getProperties() {

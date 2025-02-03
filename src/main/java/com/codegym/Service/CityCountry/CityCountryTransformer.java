@@ -1,14 +1,23 @@
 package com.codegym.Service.CityCountry;
 
-import com.codegym.domain.City;
-import com.codegym.domain.Country;
-import com.codegym.domain.CountryLanguage;
-import com.codegym.redis.CityCountry;
-import com.codegym.redis.Language;
+import com.codegym.Domain.City;
+import com.codegym.Domain.Country;
+import com.codegym.Domain.CountryLanguage;
+import com.codegym.Redis.CityCountry;
+import com.codegym.Redis.Language;
 
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+/*
+Esta clase transforma una lista de objetos 'City' en una lista de objetos 'CityCountry'.
+El método 'transform' itera sobre cada ciudad de la lista, y para cada ciudad, el método 'transformCityToCityCountry'
+construye un nuevo objeto 'CityCountry' que contiene información tanto de la ciudad como del país asociado.
+Para cada país, se recopilan datos como el código, el nombre, la población, la superficie, el continente,
+y las lenguas habladas en ese país.
+Las lenguas se convierten en objetos 'Language', y luego se asignan al objeto 'CityCountry'.
+*/
 
 public class CityCountryTransformer {
 

@@ -1,9 +1,19 @@
-package com.codegym.redis;
+package com.codegym.Redis;
 
-import com.codegym.domain.Continent;
+import com.codegym.Domain.Continent;
 
 import java.math.BigDecimal;
 import java.util.Set;
+/*
+Esta clase representa un aentidad combinada que almacena tanto los datos de una ciudad como su país asociado.
+Contiene atributos relacionados con la ciudad, como 'id', 'name', 'district', y 'population', así como
+atributos del país, como 'countryCode', 'alternativeCountryCode', 'countryName', 'continent', 'countryRegion',
+'countrySurfaceArea', y 'countryPopulation'.
+Además, incluye un conjunto de idiomas ('languages') hablados en el país.
+Esta clase se usa principalmente como un objeto de transferencia de datos (DTO), permitiendo representar
+la información de una ciudad y su país de forma combinada, facilitando el acceso y manipulación de ambos
+conjuntos de datos en una sola estructura.
+*/
 
 public class CityCountry {
     private Integer id;
